@@ -32,6 +32,7 @@ static ssize_t led_drv_read (struct file *file, char __user *buf, size_t size, l
 {
 	printk("%s %s line %d\n", __FILE__, __FUNCTION__, __LINE__);
 	return 0;
+
 }
 
 /* write(fd, &val, 1); */
