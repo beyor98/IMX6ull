@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 	}
 
 	/* 3. 写文件 */
-	if (0 == strcmp(argv[2], "on"))//比较相等
+	if (0 == strcmp(argv[2], "on"))
 	{
 		status = 1;
 		write(fd, &status, 1);

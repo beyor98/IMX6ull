@@ -1,4 +1,4 @@
-#include <linux/module.h>
+﻿#include <linux/module.h>
 
 #include <linux/fs.h>
 #include <linux/errno.h>
@@ -17,8 +17,9 @@
 
 #include "led_opr.h"
 
+#define LED_NUM 2
 
-/* 1. 确定主设备号                */
+/* 1. 确定主设备号                                                                 */
 static int major = 0;
 static struct class *led_class;
 struct led_operations *p_led_opr;
@@ -38,7 +39,7 @@ static ssize_t led_drv_write (struct file *file, const char __user *buf, size_t 
 {
 	int err;
 	char status;
-	struct inode *inode = file_inode(file); //获取设备号
+	struct inode *inode = file_inode(file);
 	int minor = iminor(inode);
 	
 	printk("%s %s line %d\n", __FILE__, __FUNCTION__, __LINE__);
@@ -95,11 +96,10 @@ static int __init led_init(void)
 		return -1;
 	}
 
-	p_led_opr = get_board_led_opr();
-
-	for (i = 0; i < p_led_opr->num; i++)
+	for (i = 0; i < LED_NUM; i++)
 		device_create(led_class, NULL, MKDEV(major, i), NULL, "100ask_led%d", i); /* /dev/100ask_led0,1,... */
-
+	
+	p_led_opr = get_board_led_opr();
 	
 	return 0;
 }
@@ -110,7 +110,7 @@ static void __exit led_exit(void)
 	int i;
 	printk("%s %s line %d\n", __FILE__, __FUNCTION__, __LINE__);
 
-	for (i = 0; i < p_led_opr->num; i++)
+	for (i = 0; i < LED_NUM; i++)
 		device_destroy(led_class, MKDEV(major, i)); /* /dev/100ask_led0,1,... */
 
 	device_destroy(led_class, MKDEV(major, 0));
