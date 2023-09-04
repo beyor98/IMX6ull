@@ -109,7 +109,6 @@ static int __init led_init(void)
 	printk("%s %s line %d\n", __FILE__, __FUNCTION__, __LINE__);
 	major = register_chrdev(0, "100ask_led", &led_drv);  /* /dev/led */
 
-
 	led_class = class_create(THIS_MODULE, "100ask_led_class");
 	err = PTR_ERR(led_class);
 	if (IS_ERR(led_class)) {
@@ -118,9 +117,6 @@ static int __init led_init(void)
 		return -1;
 	}
 
-//	p_led_opr = get_board_led_opr();
-
-	
 	return 0;
 }
 

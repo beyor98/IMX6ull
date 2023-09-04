@@ -96,13 +96,30 @@ static int __init led_init(void)
 		return -1;
 	}
 
-	for (i = 0; i < LED_NUM; i++)
-		device_create(led_class, NULL, MKDEV(major, i), NULL, "100ask_led%d", i); /* /dev/100ask_led0,1,... */
-	
-	p_led_opr = get_board_led_opr();
-	
+		
 	return 0;
 }
+
+void register_led_operation(struct led_operations *opr)
+{
+	p_led_opr = opr;
+}
+
+void led_device_create(int minor)
+{
+	device_create(led_class, NULL, MKDEV(major, minor), NULL, "100ask_led%d", minor);
+}
+
+void led_device_destroy(int minor)
+{
+	device_destroy(led_class,  MKDEV(major, minor));
+}
+
+
+EXPORT_SYMBOL(led_device_create);
+EXPORT_SYMBOL(led_device_destroy);
+EXPORT_SYMBOL(register_led_operation);
+
 
 /* 6. 有入口函数就应该有出口函数：卸载驱动程序时，就会去调用这个出口函数           */
 static void __exit led_exit(void)
@@ -113,7 +130,6 @@ static void __exit led_exit(void)
 	for (i = 0; i < LED_NUM; i++)
 		device_destroy(led_class, MKDEV(major, i)); /* /dev/100ask_led0,1,... */
 
-	device_destroy(led_class, MKDEV(major, 0));
 	class_destroy(led_class);
 	unregister_chrdev(major, "100ask_led");
 }
