@@ -18,5 +18,11 @@ clean:
 	rm -rf modules.order
 	rm -f ledtest
 
-obj-m	+= led_drv.o
+# 参考内核源码drivers/char/ipmi/Makefile
+# 要想把a.c, b.c编译成ab.ko, 可以这样指定:
+# ab-y := a.o b.o
+# obj-m += ab.o
 
+# leddrv.c board_demo.c 编译成 100ask.ko
+100ask_led-y := leddrv.o board_demo.o
+obj-m	+= 100ask_led.o

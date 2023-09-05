@@ -14,27 +14,45 @@
 static int major;
 static struct class *led_class;
 
+/* registers */
+// IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 地址：0x02290000 + 0x14
+static volatile unsigned int *IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3;
+
+// GPIO5_GDIR 地址：0x020AC004
+static volatile unsigned int *GPIO5_GDIR;
+
+//GPIO5_DR 地址：0x020AC000
+static volatile unsigned int *GPIO5_DR;
+
+
 static ssize_t led_write(struct file *filp, const char __user *buf,
 			 size_t count, loff_t *ppos)
 {
 	char val;
 	/* copy_from_user : get data from app */
 	copy_from_user(&val, buf, 1);
-
+	
 	/* to set gpio register: out 1/0 */
 	if (val)
 	{
 		/* set gpio to let led on */
+		*GPIO5_DR &= ~(1<<3);
 	}
 	else
 	{
 		/* set gpio to let led off */
+		*GPIO5_DR |= (1<<3);
 	}
+
 	return 1;
 }
 
 static int led_open(struct inode *inode, struct file *filp)
 {
+	*IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 &= ~0xf;
+	*IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 |= 0x5;
+
+	*GPIO5_GDIR |= (1<<3);
 	/* enable gpio
 	 * configure pin as gpio
 	 * configure gpio as output 
@@ -52,6 +70,10 @@ static struct file_operations led_fops = {
 static int __init led_init(void)
 {
 	printk("%s %s %d\n", __FILE__, __FUNCTION__, __LINE__);
+
+	IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 = ioremap(0x02290000 + 0x14, 4);
+	GPIO5_GDIR = ioremap(0x020AC004, 4);
+	GPIO5_DR = ioremap(0x020AC000, 4);
 	
 	major = register_chrdev(0, "100ask_led", &led_fops);
 
