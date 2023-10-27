@@ -1,0 +1,6 @@
+# 忽略所有编译文件
+*.d
+*.o
+# 忽略编译目录
+/build/
+/source/02_led_drv/05_led_drv_template_device_tree_test/
